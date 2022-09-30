@@ -1,0 +1,48 @@
+version: '3.3'
+
+services:
+
+  arbiter:
+      container_name: arbiter
+      hostname: arbiter
+      image: containers.intersystems.com/intersystems/arbiter:2022.1.0.209.0
+      init: true
+      command: 
+        - /usr/local/etc/irissys/startISCAgent.sh 2188
+
+  mirrorA:
+    image: containers.intersystems.com/intersystems/iris:2022.1.0.209.0
+    container_name: mirrorA
+    depends_on:
+      - arbiter
+    ports:
+    - "52775:52773"
+    volumes:
+    - ./sharedA:/shared
+    - ./install:/install
+    command: 
+      --check-caps false
+      --key /install/iris.key
+      -a /install/installer.sh
+    environment:
+    - ISC_DATA_DIRECTORY=/shared/durable
+    hostname: mirrorA
+
+  mirrorB:
+    image: containers.intersystems.com/intersystems/iris:2022.1.0.209.0
+    container_name: mirrorB
+    depends_on:
+      - arbiter
+      - mirrorA
+    ports:
+    - "52776:52773"
+    volumes:
+    - ./sharedB:/shared
+    - ./install:/install
+    command: 
+      --check-caps false
+      --key /install/iris.key
+      -a /install/installer.sh
+    environment:
+    - ISC_DATA_DIRECTORY=/shared/durable
+    hostname: mirrorB
