@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="22" zv="Cache for Windows (x86-32) 2008.1 (Build 545)" ts="2008-06-24 16:01:40">
+<Class name="Phonebook.Installer">
+<IncludeCode>%occInclude</IncludeCode>
+<TimeChanged>65440,71037.127314</TimeChanged>
+<TimeCreated>65440,71037.127314</TimeCreated>
+
+<XData name="PhonebookApp">
+<Description>
+Application Definition</Description>
+<XMLNamespace>INSTALLER</XMLNamespace>
+<Data><![CDATA[
+<Manifest>
+
+<Namespace Name="CUSTOMER"
+          Create="yes"
+          Code="CUSTOMER"
+          Data="CUSTOMER"
+          Ensemble = "0"
+          >
+		  
+<If Condition="(${CUSTEXIST}=0)">
+
+<Configuration>
+<Database Name="CUSTOMER"
+		 Dir="${DBDIR}customer/"
+		 Create="yes"
+		 Resource="%DB_%DEFAULT"
+		 PublicPermissions="" />
+</Configuration>
+
+</If>
+
+<CSPApplication Url="/csp/customer"
+	           Resource=""
+	           Description="Customer Web Interface"
+	           Directory="${CSPDIR}customer"
+	           Recurse="1"
+	           CookiePath="/csp/customer"
+	           AuthenticationMethods="32" 
+	           />
+
+</Namespace>
+
+<Namespace Name="PERSONAL"
+          Create="yes"
+          Code="PERSONAL"
+          Data="PERSONAL"
+          Ensemble = "0"
+		  >
+		  
+<If Condition="(${PERSONALEXIST}=0)">
+<Configuration>
+
+<Database Name="PERSONAL"
+		 Dir="${DBDIR}personal/"
+		 Create="yes"
+		 Resource="%DB_%DEFAULT"
+		 PublicPermissions=""/>
+
+</Configuration>
+</If>
+
+<CSPApplication Url="/csp/personal"
+	           Resource=""
+	           Description="Personal Web Interface"
+	           Directory="${CSPDIR}personal"
+	           Recurse="1"
+	           CookiePath="/csp/personal"
+	           AuthenticationMethods="32"
+	           />
+
+</Namespace>
+
+<Namespace Name="PHONEBOOK"
+          Create="overwrite"
+          Code="COMPANY"
+          Data="COMPANY"
+          Ensemble = "0"
+		  >
+		  
+<If Condition="(${COMPEXIST}=0)">
+<Configuration>
+
+<Database Name="COMPANY"
+		 Dir="${DBDIR}company/"
+		 Create="yes"
+		 Resource="%DB_%DEFAULT"
+		 PublicPermissions=""/>
+
+<GlobalMapping Global="Phonebook.Customer*" From="CUSTOMER"/>
+<GlobalMapping Global="Phonebook.Personal*" From="PERSONAL"/>
+
+</Configuration>
+</If>
+
+<CSPApplication Url="/csp/phonebook"
+	           Resource=""
+	           Description="Phonebook Web Interface"
+	           Directory="${CSPDIR}phonebook"
+	           Recurse="1"
+	           CookiePath="/csp/phonebook"
+	           AuthenticationMethods="32"
+	 />
+
+<CSPApplication Url="/csp/company"
+	           Resource=""
+	           Description="Company pages"
+	           Directory="${CSPDIR}company"
+	           Recurse="1"
+	           CookiePath="/csp/company"
+	           AuthenticationMethods="32"
+	 />
+	 
+<CopyFile Src="${PHONEBOOKFILESDIR}cube_logo_blue.gif"
+		  Target="${CSPDIR}phonebook/"/>
+		  
+<CopyFile Src="${PHONEBOOKFILESDIR}Company.csp"
+		  Target="${CSPDIR}company/"/>	
+		  	  
+<Import File="${STUDENTDIR}PhonebookClasses.xml" Flags="ck"/>
+
+<LoadPage Name="/csp/company/Company.csp" />
+
+</Namespace>
+
+</Manifest>
+]]></Data>
+</XData>
+
+<Method name="RunInstall">
+<Description>
+Invoke the installer passing in some variables. 
+studentDir = Normalized location of student files. 
+dbDir = parent directory for folders that will hold company, customer, and personal DBs (uses Manager directory if not defined). 
+logLevel = level of logging on scale of 0-3 (0 = none, 3 = verbose). </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>studentDir:%String="/management/",dbDir="",logLevel=1</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set tStatus = $$$OK
+	
+	try {
+		
+		if dbDir = "" {
+			set dbDir = $SYSTEM.Util.ManagerDirectory()
+		}
+		
+		// Initialize any variables we want to pass to the installer
+		set tVars("STUDENTDIR") = ##class(%Library.File).NormalizeDirectory(studentDir)
+		set tVars("DBDIR") = ##class(%Library.File).NormalizeDirectory(dbDir)
+		set tVars("PHONEBOOKFILESDIR") = ##class(%Library.File).NormalizeDirectory(tVars("STUDENTDIR")_"PhonebookFiles/")
+		set tVars("CUSTEXIST") = ##class(Config.Databases).Exists("CUSTOMER")
+		set tVars("PERSONALEXIST") = ##class(Config.Databases).Exists("PERSONAL")
+		set tVars("COMPEXIST") = ##class(Config.Databases).Exists("COMPANY")
+		
+		// Invoke the installer
+		Set tStatus = ..setup(.tVars,logLevel)
+		$$$ThrowOnError(tStatus)
+	}
+	catch ex {
+		write ex.DisplayString()
+		set tStatus = ex.AsStatus()
+	}
+	return tStatus
+]]></Implementation>
+</Method>
+
+<Method name="setup">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<CodeMode>objectgenerator</CodeMode>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer,pInstaller:%Installer.Installer]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#; Let XGL document generate code for this method. 
+	return ##class(%Installer.Manifest).%Generate(%compiledclass, %code, "PhonebookApp")
+]]></Implementation>
+</Method>
+</Class>
+</Export>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApplicationsExport>
+  <Applications>
+    <AutheEnabled>64</AutheEnabled>
+    <AutoCompile>1</AutoCompile>
+    <CookiePath>/csp/company/</CookiePath>
+    <Enabled>1</Enabled>
+    <HyperEvent>0</HyperEvent>
+    <LockCSPName>true</LockCSPName>
+    <Name>/csp/company</Name>
+    <NameSpace>PHONEBOOK</NameSpace>
+    <Path>c:\InterSystems\Cache\CSP\company</Path>
+    <Recurse>true</Recurse>
+    <ServeFiles>false</ServeFiles>
+    <Timeout>900</Timeout>
+    <Type>2</Type>
+    <UseCookies>1</UseCookies>
+  </Applications>
+  <Applications>
+    <AutheEnabled>64</AutheEnabled>
+    <AutoCompile>1</AutoCompile>
+    <CookiePath>/csp/phonebook/</CookiePath>
+    <Enabled>1</Enabled>
+    <HyperEvent>0</HyperEvent>
+    <LockCSPName>true</LockCSPName>
+    <LoginPage>Phonebook.Login.cls</LoginPage>
+    <Name>/csp/phonebook</Name>
+    <NameSpace>PHONEBOOK</NameSpace>
+    <Path>c:\InterSystems\Cache\CSP\phonebook\</Path>
+    <Recurse>true</Recurse>
+    <ServeFiles>false</ServeFiles>
+    <Timeout>900</Timeout>
+    <Type>2</Type>
+    <UseCookies>1</UseCookies>
+  </Applications>
+</ApplicationsExport>

@@ -1,0 +1,610 @@
+Cache for Windows^MAC^WNS^^~Format=Cache.S~
+%RO on 13 Dec 2010 05:15:10PM
+Phonebook^MAC^^62073,61626^0
+ 
+Phonebook ; display an ordered list of matches
+    ; user can enter a valid date of birth
+ 
+main    ; main section
+   
+   
+  	//******TO DO FOR EXERCISE: Remove the /* from
+  	//three lines below and 2*/ from eleven lines below and then
+  	//compile or save the routine. If you get a compile error
+  	//contact the intsructor. 
+  	/*set status=$SYSTEM.Security.AddRoles("ForPhonebookRoutine")
+	if $SYSTEM.Status.IsError(status) {
+	Do DecomposeStatus^%apiOBJ(status,.err,"-d") 
+	For i=1:1:err Write !,err(i)
+	Write !, "User: ", $username
+    	Write !, "Roles: ", $Roles
+    	kill err
+	quit
+	}
+*/
+	
+    ; Display user and roles
+    Write !, "User: ", $username
+    Write !, "Roles: ", $Roles
+    ; start looping
+    for  {
+        do getAction() 
+        quit:(action = "")
+        quit:((action = "Quit")||(action="Q")||(action="5")||(action="q"))
+        }
+    quit
+ 
+getAction() [action] ; ask user for action
+    {
+	Write !
+	Write !, "1) Display"
+	Write !, "2) Edit"
+	Write !, "3) Add"
+	Write !, "4) Delete"
+	Write !, "5) Quit"
+    read !, "Option? ", action
+    quit:(action = "")  ; user entered nothing
+    ; figure out what user entered
+    if ((action = "Display")||(action="D")||(action="d")||(action="1"))
+    	{
+	    do getContactsForDisplay()
+    	}
+    elseif ((action= "Edit")||(action="E")||(action="e")||(action="2"))
+    	{
+	    do getContactForEdit()
+    	}
+    elseif ((action="Add")||(action="A")||(action="a")||(action="3"))
+    	{
+	    do addContact()
+    	}
+    elseif ((action="Delete")||(action="D")||(action="d")||(action="4"))
+    	{
+	    do getContactForDelete()
+	    
+   	 	}
+    	
+    else
+    {
+	 	quit   
+    }
+    quit
+  
+ }
+ 
+getContactForEdit()
+	{
+	
+	Set $ztrap="Err"
+	Write !
+	Write !, "What type of Contact?"
+	Write !, "1) Customer"
+	Write !, "2) Personal"
+	Write !, "3) Vendor"
+	Read !, "Option? ", type
+	
+	if ((type="Customer")||(type="C")||(type="c")||(type="1")){set type="Customer"}
+	elseif ((type="Personal")||(type="P")||(type="p")||(type="2")){set type="Personal"}
+	elseif ((type="Vendor")||(type="V")||(type="v")||(type="3")){set type="Vendor"}
+	else{
+	Write " Type not recognized"
+	Quit	
+	}
+	
+	set contactList=$zobjclassmethod("Phonebook.ContactFacade","Get"_type_"s", $username)
+	
+	Write !
+	Write !, "Please Select a Contact"
+	Write !
+	
+	
+	if (contactList.Count()=0)
+	{
+		
+	Write !
+	Write !, "No Contacts Found"	
+	}
+	
+	else {
+	for i=1:1:contactList.Count() 
+	{
+	
+	 set cn=contactList.GetAt(i)
+	 Write !, i_") "_cn.Name
+	 			
+	 			
+	}
+	
+	Read !, "Contact? ", name
+	set i=0
+	set contact=##class(Phonebook.ContactData).%New()
+	
+	//iterate through contact list looking for a match
+	while( (name '=contact.Name) && (name '= i) &&(i '= contactList.Count()))
+	{
+		Set i= i+1
+		Set contact=contactList.GetAt(i)
+			
+	}
+	
+	//if no match, error message and quit
+	if ((name '=contact.Name) && (name '=i)) || (name = "")
+	{
+		Write !, " Name not found"
+		Quit
+	}
+	
+	//if match, edit that contact	
+	else
+	{
+		do editContact(contact,type)	
+		
+	}
+	
+	}
+ 
+	 Quit
+	
+Err	goto Err^Phonebook	
+	}
+	
+	
+editContact(contact,type)
+	{
+		Set $ztrap="Err"
+		Write !
+		 
+		Write !, "Edit Contact ", contact.Name
+		
+		Write !, "Edit the Contact's Name?"
+		Write !, "1) Yes"
+		Write !, "2) No"
+		Read !, "Option No =>  ", change
+		
+		If ((change="1")||(change="Y")||(change="y")||(change="Yes"))
+		{
+		
+		Read !, "New Name? ", name
+		
+		set contact.Name=name	
+			
+		}
+		
+		
+		Write !, "Current Title: "_contact.Title
+		Write !, "Edit Title?"
+		Write !, "1) Yes"
+		Write !, "2) No"
+		Read !, "Option No =>  ", change
+		
+		If ((change="1")||(change="Y")||(change="y")||(change="Yes"))
+		{
+		
+		Read !, "New Title? ", title
+		
+		set contact.Title=title	
+			
+		}
+		
+		Write !, "Current Office Phone: "_contact.OfficePhone
+		Write !, "Edit Office Phone?"
+		Write !, "1) Yes"
+		Write !, "2) No"
+		Read !, "Option No =>  ", change
+		
+		If ((change="1")||(change="Y")||(change="y")||(change="Yes"))
+		{
+		
+		
+		Read !, "New Office Phone? ", ophone
+		
+		set contact.OfficePhone=ophone	
+			
+		}
+		
+		Write !, "Current Cell Phone: "_contact.CellPhone
+		Write !, "Edit Cell Phone?"
+		Write !, "1) Yes"
+		Write !, "2) No"
+		Read !, "Option No =>  ", change
+		
+		If ((change="1")||(change="Y")||(change="y")||(change="Yes"))
+		{
+		
+		Read !, "New Cell Phone? ", cphone
+		
+		set contact.CellPhone=cphone	
+			
+		}
+		
+		Write !, "Current Home Phone: "_contact.HomePhone
+		Write !, "Edit Contact's Home Phone?"
+		Write !, "1) Yes"
+		Write !, "2) No"
+		Read !, "Option No =>  ", change
+		
+		If ((change="1")||(change="Y")||(change="y")||(change="Yes"))
+		{
+		
+		Read !, "New Home Phone? ", hphone
+		
+		set contact.HomePhone=hphone	
+			
+		}
+		
+		Write !, "Current Pager Number: "_contact.Pager
+		Write !, "Edit the Pager Number?"
+		Write !, "1) Yes"
+		Write !, "2) No"
+		Read !, "Option No =>  ", change
+		
+		If ((change="1")||(change="Y")||(change="y")||(change="Yes"))
+		{
+	
+		Read !, "New Pager? ", pager
+		
+		set contact.Pager=pager	
+			
+		}
+		
+		Write !, "Current Primary Email: "_contact.Email1
+		Write !, "Edit Primary Eail?"
+		Write !, "1) Yes"
+		Write !, "2) No"
+		Read !, "Option No =>  ", change
+		
+		If ((change="1")||(change="Y")||(change="y")||(change="Yes"))
+		{
+		
+		Read !, "New Primary Email? ", pEmail
+		
+		set contact.Email1=pEmail	
+			
+		}
+		
+		Write !, "Current Secondary Email: "_contact.Email2
+		Write !, "Edit Secondary Email?"
+		Write !, "1) Yes"
+		Write !, "2) No"
+		Read !, "Option No =>  ", change
+		
+		If ((change="1")||(change="Y")||(change="y")||(change="Yes"))
+		{
+		
+		Read !, "New Secondary Email? ", sEmail
+		
+		set contact.Email2=sEmail	
+			
+		}
+		
+		Write !, "Current Comment: "_contact.Note
+		Write !, "Edit Comment?"
+		Write !, "1) Yes"
+		Write !, "2) No"
+		Read !, "Option No =>  ", change
+		
+		If ((change="1")||(change="Y")||(change="y")||(change="Yes"))
+		{
+	
+		Read !, "New Comment? ", comment
+		
+		set contact.Note=comment	
+			
+		}
+		if (contact.Company '= "")
+		{
+			Write !, "Current Company: ", contact.Company.Name
+			
+		}
+		
+		Write !, "Assign New Company?"
+		Write !, "1) Yes"
+		Write !, "2) No"
+		Read !, "Option No =>  ", change
+		
+		If ((change="1")||(change="Y")||(change="y")||(change="Yes"))
+		{
+		
+		
+		do companySelect(contact)
+			
+			
+		}
+		
+	
+		do $zobjclassmethod("Phonebook.ContactFacade","Save"_type,contact)
+				
+		
+		quit
+		
+Err	goto Err^Phonebook	
+	}
+ 
+companySelect(contact)
+	{
+		set companyList = ##class(Phonebook.ContactFacade).GetCompanies()
+		for i=1:1:companyList.Count()
+		{
+			Write !, i, ": " , companyList.GetAt(i).Name
+			
+		}
+		Read !, "Select a Company: ", company
+		set f=0
+		for i=1:1:companyList.Count()
+		{
+			if (company = i)
+			{
+				set f=1
+				set contact.Company=companyList.GetAt(company)
+				quit
+			}
+			
+		}
+		
+		if (f '=1)
+		{
+			Write !, "Company Selection Not Recognized"
+		}
+	
+		quit 	
+		
+	}
+	
+addContact()
+	{
+	  
+	  	Write !
+		Write !, "What type of Contact?"
+		Write !, "1) Customer"
+		Write !, "2) Personal"
+		Write !, "3) Vendor"
+		read !, "Option? ", type
+	
+		if ((type="Customer")||(type="C")||(type="c")||(type="1")){set type="Customer"}
+		elseif ((type="Personal")||(type="P")||(type="p")||(type="2")){set type="Personal"}
+		elseif ((type="Vendor")||(type="V")||(type="v")||(type="3")){set type="Vendor"}
+	
+		else{
+			Write " Type not recognized"
+			Quit	
+		}
+	 
+		set contact = ##class(Phonebook.ContactData).%New()
+		do createContact(contact,type) 
+	  quit
+		 
+	 }
+createContact(contact,type)
+	{
+		
+		Set $ztrap="Err"
+		Write !
+		Write !, "Add "_type_" Contact"
+		Read !, "Contact Name? ", name
+		
+		If (name="")
+		{
+			Write !, "Contact must have a name"
+			Quit
+			
+		}
+		else
+		{
+			set contact.Name=name	
+			
+		}
+		
+	
+		Read !, "Title? ", title
+		
+			set contact.Title=title
+		
+		Read !, "Office Phone? ", ophone
+		
+			set contact.OfficePhone=ophone	
+			
+		Read !, "Cell Phone? ", cphone
+		
+			set contact.CellPhone=cphone	
+			
+		Read !, "Home Phone? ", hphone
+		
+			set contact.HomePhone=hphone	
+			
+		Read !, "Pager? ", pager
+		
+			set contact.Pager=pager	
+			
+		Read !, "Primary Email? ", pEmail
+		
+			set contact.Email1=pEmail	
+			
+		Read !, "Secondary Email? ", sEmail
+		
+			set contact.Email2=sEmail	
+			
+		Read !, "Comment? ", comment
+		
+			set contact.Note=comment
+			
+			set contact.Active=1
+			set contact.Owner=$username
+		
+	
+		Write !
+		do companySelect(contact)
+			
+			
+		do $zobjclassmethod("Phonebook.ContactFacade","Save"_type,contact)
+			
+		Write !, "Contact Added"	
+		
+		quit
+		
+Err	goto Err^Phonebook			
+	}  
+getContactsForDisplay()//get a ContactType
+	{
+	Write !
+	Write !, "What type of Contact?"
+	Write !, "1) Customer"
+	Write !, "2) Personal"
+	Write !, "3) Vendor"
+	read !, "Option? ", type
+	
+	if ((type="Customer")||(type="C")||(type="c")||(type="1")){set type="Customer"}
+	elseif ((type="Personal")||(type="P")||(type="p")||(type="2")){set type="Personal"}
+	elseif ((type="Vendor")||(type="V")||(type="v")||(type="3")){set type="Vendor"}
+	else{
+	Write " Type not recognized"
+	Quit	
+	}
+	
+	do displayContacts(type)	
+	}
+ 
+displayContacts(type) //Display Contacts 
+	{
+	
+	Set $ztrap="Err"
+		
+			//set contactList=##class(Phonebook.ContactFacade).GetCustomers()
+	
+			 set contactList=$zobjclassmethod("Phonebook.ContactFacade","Get"_type_"s", $username)
+			write !
+			write !, type_" Contacts: "
+	
+			
+			for i=1:1:contactList.Count() 
+			{
+	
+	 			set cn=contactList.GetAt(i)
+				write !,"Name: ", cn.Name 
+				write !, " Title: ", cn.Title
+				if (cn.Company '= "")
+				{
+					write !," Company: ", cn.Company.Name
+					Write !," Company Address: ", cn.Company.Address
+				}
+				Write !," Office Phone: ", cn.OfficePhone
+				Write !," Cell Phone: ", cn.CellPhone
+				Write !," Home Phone: ", cn.HomePhone
+				Write !," Pager: ", cn.Pager
+				Write !," Email 1: ",cn.Email1
+				Write !," Email 2: ", cn.Email2
+				Write !," Note: ", cn.Note
+				Write !," Contact Owner: ", cn.Owner
+				write !, "-------------------------------------------------------------------"	
+		
+			}
+		
+ 
+	quit
+Err	goto Err^Phonebook	
+	}
+	
+getContactForDelete()  
+{
+	
+	Set $ztrap="Err"
+	
+	Write !
+	Write !, "What type of Contact?"
+	Write !, "1) Customer"
+	Write !, "2) Personal"
+	Write !, "3) Vendor"
+	Write !
+	Read !, "Option? ", type
+	
+	if ((type="Customer")||(type="C")||(type="c")||(type="1")){set type="Customer"}
+	elseif ((type="Personal")||(type="P")||(type="p")||(type="2")){set type="Personal"}
+	elseif ((type="Vendor")||(type="V")||(type="v")||(type="3")){set type="Vendor"}
+	else{
+	Write " Type not recognized"
+	Quit	
+	}
+	
+	set contactList=$zobjclassmethod("Phonebook.ContactFacade","Get"_type_"s", $username)
+	
+ 
+	if (contactList.Count() =0)
+	{
+		Write !, "No Contacts Found"
+	}
+	else
+	{
+	Write !, "Please Select a Contact"
+	for i=1:1:contactList.Count() 
+	{
+	
+	 set cn=contactList.GetAt(i)
+	 Write !, i_") "_cn.Name
+	 			
+	 			
+	}
+	
+	Write !
+	Read !, "Contact? ", name
+	set i=0
+	set contact=##class(Phonebook.ContactData).%New()
+	
+	//iterate through contact list looking for a match
+	while( (name '=contact.Name) && (name '= i) &&(i '= contactList.Count()))
+	{
+		Set i= i+1
+		Set contact=contactList.GetAt(i)
+			
+	}
+	
+	//if no match, error message and quit
+	if ((name '=contact.Name) && (name '=i)) || (name = "")
+	{
+		Write !, "Name not found"
+		Quit
+	}
+	
+	//if match, edit that contact	
+	else
+	{
+		do deleteContact(contact,type)	
+		do $SYSTEM.Security.Audit("Phonebook",type,"CHUIDelete",contact.Name,"A user was deleted using ^Phonebook")
+		
+	}
+	 
+	 //Write !, "Contact Deleted"
+	}
+	 Quit
+	
+Err	goto Err^Phonebook	
+}
+	
+deleteContact(contact,type)
+{
+	Set $ztrap="Err"
+		
+		if (contact '= "")
+		{
+			set contact.Active = 0
+			
+		}
+		
+	do $zobjclassmethod("Phonebook.ContactFacade","Save"_type,contact)
+		
+		
+	Quit
+		
+		
+Err	goto Err^Phonebook	
+	}
+ 
+Err 
+	Write !, "Error ", $ze
+	trollback
+ 	quit
+	
+ 
+	
+	
+	
+
+
+
