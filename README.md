@@ -40,4 +40,5 @@ The applications are accessible from the following routes:
 
 From these applications you will be able to create new records for the databases and check how the mirror works, replicating the mirrored databases from mirrorA to mirrorB. You can refer to [IRIS documentation](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GHA_mirror_set_config) to get more information about mirroring.
 
+# WARNING!
 This project is not configured with a valid license of InterSystems IRIS, so please, contact with [Luis Ángel Pérez](mailto:LuisAngel.PerezRamos@intersystems.com) if you want to test it or use it for training purposes.
