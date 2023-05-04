@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+  <Document name="workshop-phonebook-company.ZPM">
+    <Module>
+      <Name>workshop-phonebook-company</Name>
+      <Version>1.0.0</Version>
+      <Description>Samples two applications (PHONEBOOK and COMPANY)</Description>
+      <Packaging>module</Packaging>
+  <Keywords>workshop phonebook company</Keywords>
+<Author>
+<Person>Luis Angel Pérez Ramos</Person>
+<CopyrightDate>2023</CopyrightDate>
+<License>MIT</License>
+<Notes>
+repository:
+https://github.com/intersystems-ib/workshop-multiple-instances
+description:
+This repository contains the material required to deploy multiple instances of IRIS and the arbiter in order to configure functionalities as the mirroring or ECP.
+</Notes>
+</Author>
+	<SourcesRoot>src</SourcesRoot>
+	<Resource Name="Phonebook.PKG"/>
+    <Resource Name="Phonebook.MAC"/>
+    <CSPApplication 
+		SourcePath="/src/csp"
+		DeployPath="${cspdir}/phonebook"
+		Url="/csp/phonebook" 
+		ServeFiles="1"
+		CookiePath="/csp/phonebook/"
+		PasswordAuthEnabled="1"
+		AuthenticationMethods="32" 
+		MatchRoles=":%ALL"
+		Recurse="1"/>
+    <CSPApplication 
+		SourcePath="/src/csp"
+		DeployPath="${cspdir}/company"
+		Url="/csp/company" 
+		ServeFiles="1"
+		CookiePath="/csp/company/"
+		PasswordAuthEnabled="1"
+		AuthenticationMethods="32" 
+		MatchRoles=":%ALL"
+		Recurse="1"/>
+<AfterInstallMessage>
+ You can load admins panel at:
+&#13; http://127.0.0.1:52773/csp/phonebook/Phonebook.AllStart.cls
+&#13; http://127.0.0.1:52773/csp/company/Company.csp
+</AfterInstallMessage>
+</Module>
+</Document>
+</Export>
