@@ -17,6 +17,7 @@ services:
       - arbiter
     ports:
     - "52775:52773"
+    - "51775:1972"
     volumes:
     - ./sharedA:/shared
     - ./install:/install
@@ -37,6 +38,7 @@ services:
       - mirrorA
     ports:
     - "52776:52773"
+    - "51776:1972"
     volumes:
     - ./sharedB:/shared
     - ./install:/install
