@@ -13,7 +13,7 @@ You can find more in-depth information in https://learning.intersystems.com.
 Build the image we will use during the workshop:
 
 ```console
-$ git clone https://github.com/intersystems-ib/workshop-multple-instances
+$ git clone https://github.com/intersystems-ib/workshop-multiple-instances
 $ cd workshop-multiple-instances
 $ docker-compose build
 ```
